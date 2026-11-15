@@ -66,7 +66,7 @@ export function TrialView({ initial }: { initial: Trial }) {
               </span>
             ))}
             {cost > 0 && (
-              <span className="text-mist">${cost.toFixed(2)} compute</span>
+              <span className="text-mist">${cost.toFixed(3)} compute</span>
             )}
           </p>
         </div>

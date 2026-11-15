@@ -109,6 +109,7 @@ export async function runClaim(
     await waitUntilReady(boat, sandboxId, { timeoutMs: 240_000 });
     await waitForDesktop(boat, sandboxId, { timeoutMs: 240_000 });
     report.log("desktop up; recording");
+    // The recorder starts first: started after Chrome, it records a blank desktop.
     await execCommand(
       boat,
       sandboxId,
@@ -118,7 +119,8 @@ export async function runClaim(
       boat,
       sandboxId,
       // The "no" Google API keys hide Chrome's "Google API keys are missing" bar from the recording.
-      `DISPLAY=:0 GOOGLE_API_KEY=no GOOGLE_DEFAULT_CLIENT_ID=no GOOGLE_DEFAULT_CLIENT_SECRET=no nohup google-chrome-stable --no-first-run --no-default-browser-check --start-maximized ${sh(claim.page)} >/dev/null 2>&1 & sleep 4; DISPLAY=:0 wmctrl -a Chrome || true`,
+      // The agent starts once the window (titled "… - Chromium" on boat) is up and the page has had 2 s to paint.
+      `DISPLAY=:0 GOOGLE_API_KEY=no GOOGLE_DEFAULT_CLIENT_ID=no GOOGLE_DEFAULT_CLIENT_SECRET=no nohup google-chrome-stable --no-first-run --no-default-browser-check --start-maximized ${sh(claim.page)} >/dev/null 2>&1 & for i in $(seq 40); do DISPLAY=:0 wmctrl -l | grep -q ' - Chromium$' && break; sleep 0.5; done; sleep 2`,
     );
     report.onTrialing();
     report.log(`Chrome open at ${claim.page}`);

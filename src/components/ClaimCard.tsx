@@ -26,6 +26,8 @@ export function ClaimCard({
           <video
             src={`/api/trials/${trialId}/video/${claim.id}`}
             controls
+            autoPlay
+            loop
             muted
             playsInline
             className="h-full w-full object-cover"

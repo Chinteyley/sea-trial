@@ -29,6 +29,7 @@ const ClaimsSchema = z.object({
 
 const INSTRUCTIONS = `List the product's capability claims that a visitor could check by actually using the product in a web browser: a free tool, demo, playground, search, calculator, converter, public docs or a public app.
 Skip vague marketing ("fast", "loved by teams", "enterprise-grade") unless the page states something measurable a visitor can see.
+The quote must be a sentence of the page's prose, never navigation, links or Markdown.
 Use only claims stated on the page. At most eight, strongest first.`;
 
 // The context.dev plan runs one request at a time per organization, so every call waits its turn here.
@@ -93,7 +94,7 @@ export async function readClaims(url: string): Promise<ReadClaim[]> {
     throw new Error(`context.dev could not read claims from ${url}`);
   const { claims } = ClaimsSchema.parse(page.json.data);
   return claims
-    .filter((c) => c.testable_without_account)
+    .filter((c) => c.testable_without_account && !c.quote.includes("]("))
     .slice(0, env.maxClaims)
     .map(({ title, quote, check }) => ({ title, quote, check, page: url }));
 }

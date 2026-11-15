@@ -19,7 +19,7 @@ export async function writeMemo(
       {
         role: "system",
         content:
-          "You write short diligence memos for early-stage investors. Plain prose, no hype. Report only what the evidence shows.",
+          "You write short diligence memos for early-stage investors. Plain prose with no Markdown, no hype. Report only what the evidence shows.",
       },
       {
         role: "user",
@@ -48,7 +48,7 @@ export async function writeMemo(
     choices: { message: { content: string } }[];
   };
   return {
-    text: json.choices[0]?.message.content ?? "",
+    text: (json.choices[0]?.message.content ?? "").replaceAll("**", ""),
     model: json.model ?? env.nyteModel,
     provider: json.trustedrouter?.routing?.selected_provider,
     receipt: response.headers.get("x-inference-receipt") ?? undefined,
