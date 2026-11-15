@@ -39,7 +39,7 @@ export function StartTrialForm() {
         placeholder="startup.com"
         aria-label="Startup URL"
         required
-        className="h-14 flex-1 rounded-xl border border-line bg-hull px-5 text-lg text-bone placeholder:text-mist/60 outline-none focus:border-flag"
+        className="h-14 w-full shrink-0 rounded-xl sm:w-auto sm:flex-1 border border-line bg-hull px-5 text-lg text-bone placeholder:text-mist/60 outline-none focus:border-flag"
       />
       <button
         disabled={pending}
