@@ -48,7 +48,8 @@ export async function writeMemo(
     choices: { message: { content: string } }[];
   };
   return {
-    text: (json.choices[0]?.message.content ?? "").replaceAll("**", ""),
+    // Kept exactly as returned, so it matches the bytes the receipt signs; the page strips Markdown.
+    text: json.choices[0]?.message.content ?? "",
     model: json.model ?? env.nyteModel,
     provider: json.trustedrouter?.routing?.selected_provider,
     receipt: response.headers.get("x-inference-receipt") ?? undefined,

@@ -16,9 +16,11 @@ export async function GET(
   const range = request.headers.get("range")?.match(/bytes=(\d+)-(\d*)/);
   const start = range ? Number(range[1]) : 0;
   const end = range?.[2] ? Number(range[2]) : size - 1;
+  // Node's web ReadableStream type and the DOM one Response takes are the same stream at
+  // runtime but don't overlap in @types/node, so the cast goes through unknown.
   const stream = Readable.toWeb(
     createReadStream(file, { start, end }),
-  ) as ReadableStream;
+  ) as unknown as ReadableStream;
   return new Response(stream, {
     status: range ? 206 : 200,
     headers: {

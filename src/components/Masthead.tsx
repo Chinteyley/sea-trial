@@ -10,7 +10,15 @@ export function Masthead() {
           Sea Trial
         </span>
       </Link>
-      <span className="text-sm text-mist">Proof, not pitch decks</span>
+      <div className="flex items-center gap-5 text-sm">
+        <span className="hidden text-mist sm:inline">Proof, not pitch decks</span>
+        <a
+          href="https://github.com/Chinteyley/sea-trial"
+          className="font-mono text-bone underline decoration-line underline-offset-4 hover:decoration-flag"
+        >
+          Source
+        </a>
+      </div>
     </header>
   );
 }

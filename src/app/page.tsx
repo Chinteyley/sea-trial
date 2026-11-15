@@ -3,7 +3,10 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { Masthead } from "@/components/Masthead";
 import { StartTrialForm } from "@/components/StartTrialForm";
+import { VERDICT_STYLE } from "@/components/verdict";
+import { env } from "@/lib/env";
 import { listTrials } from "@/lib/store";
+import type { Trial, Verdict } from "@/lib/types";
 
 export default function Home() {
   return (
@@ -24,6 +27,12 @@ export default function Home() {
             footage to back it.
           </p>
           <StartTrialForm />
+          {env.dailyTrials > 0 && (
+            <p className="font-mono text-sm text-mist">
+              One trial at a time, {env.dailyTrials} a day, up to{" "}
+              {env.maxClaims} claims each. A trial takes a few minutes.
+            </p>
+          )}
         </section>
 
         <Suspense>
@@ -34,11 +43,84 @@ export default function Home() {
   );
 }
 
-/** Past trials, read from disk on each request. */
+/** Finished trials first, as examples, then every other trial, read from disk on each request. */
 async function Logbook() {
   await connection();
-  const trials = listTrials();
-  if (!trials.length) return null;
+  const all = listTrials();
+  const featured = env.featuredTrials
+    .map((id) => all.find((t) => t.id === id))
+    .filter((t): t is Trial => Boolean(t));
+  const trials = all.filter((t) => !featured.includes(t));
+  return (
+    <>
+      {featured.length > 0 && <Featured trials={featured} />}
+      {trials.length > 0 && <Recent trials={trials} />}
+    </>
+  );
+}
+
+function Featured({ trials }: { trials: Trial[] }) {
+  return (
+    <section className="flex flex-col gap-4">
+      <h2 className="font-display text-xl font-bold">Finished sea trials</h2>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {trials.map((t) => {
+          // The headline is the first claim that did not hold up, else the first that did.
+          const lead =
+            t.claims.find(
+              (c) => c.verdict && c.verdict.verdict !== "verified",
+            ) ?? t.claims.find((c) => c.verdict);
+          return (
+            <Link
+              key={t.id}
+              href={`/trials/${t.id}`}
+              className="flex flex-col gap-4 rounded-2xl border border-line bg-hull p-6 transition-colors hover:border-flag"
+            >
+              <div className="flex items-center gap-3">
+                {t.brand?.logo && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={t.brand.logo}
+                    alt=""
+                    className="h-10 w-10 rounded-lg bg-bone object-contain p-1"
+                  />
+                )}
+                <div>
+                  <p className="font-display text-lg font-bold">
+                    {t.brand?.title ?? t.domain}
+                  </p>
+                  <p className="font-mono text-xs text-mist">{t.domain}</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 font-display font-bold">
+                {(Object.keys(VERDICT_STYLE) as Verdict[]).map((v) => {
+                  const n = t.claims.filter(
+                    (c) => c.verdict?.verdict === v,
+                  ).length;
+                  return n ? (
+                    <span key={v} className={VERDICT_STYLE[v].text}>
+                      {n} {VERDICT_STYLE[v].label.toLowerCase()}
+                    </span>
+                  ) : null;
+                })}
+              </div>
+              {lead?.verdict && (
+                <p className="text-[15px] leading-relaxed text-bone">
+                  {lead.verdict.summary}
+                </p>
+              )}
+              <span className="mt-auto font-mono text-sm text-flag">
+                Watch the boats →
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function Recent({ trials }: { trials: Trial[] }) {
   return (
     <section className="flex flex-col gap-4">
       <h2 className="font-display text-xl font-bold">Logbook</h2>
