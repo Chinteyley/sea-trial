@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sea Trial
 
-## Getting Started
+You'd never buy a boat without a sea trial. Don't fund a startup on its pitch deck.
 
-First, run the development server:
+Paste a startup's URL. Sea Trial reads the claims on its site with [context.dev](https://www.context.dev), gives each claim its own [boat.dev](https://boat.dev) sandbox, and has an agent use the real product in Chrome on that sandbox's desktop while the screen records. Each claim comes back verified, partial, failed or untestable, with the recording as proof. [NY Token Exchange](https://nytokenexchange.com) writes the diligence memo on its confidential route and returns a signed inference receipt.
+
+## Run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun install
+cp .env.example .env.local   # fill in the keys
+bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Before the first trial:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **boat.dev:** a plan or the trial (`boat billing plan`). Create an API key that can create sandboxes:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+  ```bash
+  boat api-key create sea-trial --actions sandbox.create,sandbox.read,sandbox.update,sandbox.stop,agent.prompt,exec,file.read,file.write,desktop,host,snapshot.read,snapshot.write,account.read
+  ```
 
-## Learn More
+  Then connect a Claude or ChatGPT subscription on [Agents & Proxying](https://boat.dev/dashboard?tab=agents).
+- **context.dev** and **NYTE** keys go in `.env.local`.
 
-To learn more about Next.js, take a look at the following resources:
+Time a single claim on a single boat, without context.dev or NYTE:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+bun --env-file=.env.local scripts/spike.ts https://example.com "The page shows a title" "Open the page and read the heading"
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Print the claims context.dev reads from a site, without running a boat:
 
-## Deploy on Vercel
+```bash
+bun --env-file=.env.local scripts/claims.ts https://excalidraw.com
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## How it works
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Step | Code |
+| --- | --- |
+| Read the brand and the claims a visitor can check without an account | `src/lib/context.ts` |
+| One sandbox per claim: desktop, recording, Chrome, `boat prompt`, `verdict.json`, MP4 | `src/lib/boat.ts` |
+| Run the claims at most `MAX_PARALLEL` at a time, then write the memo | `src/lib/trial.ts` |
+| Memo on `trustedrouter/confidential` with `x-inference-receipt` | `src/lib/memo.ts` |
+| Live wall: embedded desktops while trialing, recordings and verdicts after | `src/components/TrialView.tsx` |
+
+Trials and recordings are kept in `data/`. Each sandbox is stopped, not deleted, after its claim, so it keeps its disk and can be resumed for the next trial.

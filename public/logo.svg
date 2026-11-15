@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Sea Trial mark: the Q signal flag ("my vessel is healthy, request clearance") carrying a check, on a mast in the water -->
+  <rect width="1024" height="1024" rx="224" fill="#0B2545"/>
+  <g transform="translate(46 24)">
+  <line x1="318" y1="214" x2="318" y2="760" stroke="#F4F1E8" stroke-width="34" stroke-linecap="round"/>
+  <path d="M335 230 H746 a14 14 0 0 1 14 14 V546 a14 14 0 0 1 -14 14 H335 Z" fill="#FFD23F"/>
+  <path d="M440 398 L522 478 L668 322" fill="none" stroke="#0B2545" stroke-width="54" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <path d="M190 812 q 80 -46 160 0 t 160 0 t 160 0 t 160 0" fill="none" stroke="#F4F1E8" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
