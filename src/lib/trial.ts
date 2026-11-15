@@ -4,11 +4,43 @@ import { runClaim } from "./boat";
 import { readBrand, readClaims } from "./context";
 import { env } from "./env";
 import { writeMemo } from "./memo";
-import { getTrial, saveTrial, updateClaim, updateTrial } from "./store";
+import {
+  getTrial,
+  listTrials,
+  saveTrial,
+  updateClaim,
+  updateTrial,
+} from "./store";
 import type { Claim, Trial } from "./types";
 
 function message(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+/** A trial left unfinished by a server restart stops counting as out after this long. */
+const STALE_MS = 30 * 60_000;
+
+/**
+ * Why a new trial cannot start right now, or nothing. The public demo runs one trial at a
+ * time and at most DAILY_TRIALS a UTC day, since every trial spends boats, model time and API calls.
+ */
+export function refusal(): string | undefined {
+  const now = Date.now();
+  const trials = listTrials().filter(
+    (t) => !env.featuredTrials.includes(t.id),
+  );
+  const out = trials.some(
+    (t) =>
+      ["reading", "trialing", "writing"].includes(t.status) &&
+      now - t.createdAt < STALE_MS,
+  );
+  if (out)
+    return "A boat is already out on a sea trial. Watch it in the logbook below, or try again in a few minutes.";
+  const dayStart = new Date(now).setUTCHours(0, 0, 0, 0);
+  const today = trials.filter((t) => t.createdAt >= dayStart).length;
+  if (env.dailyTrials && today >= env.dailyTrials)
+    return `Today's ${env.dailyTrials} sea trials have all sailed. New boats leave at midnight UTC; the finished trials below show what you'd get.`;
+  return undefined;
 }
 
 export function startTrial(url: string): Trial {

@@ -101,7 +101,7 @@ export function TrialView({ initial }: { initial: Trial }) {
             </span>
           </div>
           <p className="max-w-3xl whitespace-pre-wrap text-[17px] leading-relaxed">
-            {trial.memo.text}
+            {trial.memo.text.replaceAll("**", "")}
           </p>
           {trial.memo.receipt && (
             <p className="flex items-center gap-2 font-mono text-xs text-verified">

@@ -23,4 +23,11 @@ export const env = {
   maxClaims: Number(process.env.MAX_CLAIMS ?? 4),
   /** Minutes an agent gets per claim before the trial calls it. */
   claimMinutes: Number(process.env.CLAIM_MINUTES ?? 8),
+  /** New trials allowed per UTC day across all visitors; 0 means no cap. */
+  dailyTrials: Number(process.env.DAILY_TRIALS ?? 0),
+  /** Trial ids shown first on the home page as finished examples. */
+  featuredTrials: (process.env.FEATURED_TRIALS ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean),
 };
