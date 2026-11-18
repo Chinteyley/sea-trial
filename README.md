@@ -4,7 +4,7 @@ You'd never buy a boat without a sea trial. Don't fund a startup on its pitch de
 
 _Shipped aboard a boat: this line was committed and pushed from inside a boat.dev sandbox._
 
-_And this one from a real boat: shipped from the deck of the Koh Pich → Chroy Changvar ferry in Phnom Penh, typed to my coding agent mid-crossing._
+_And this one from a real boat: shipped mid-crossing on the Koh Pich ⇄ Chroy Changvar ferry, Phnom Penh._
 
 Paste a startup's URL. Sea Trial reads the claims on its site with [context.dev](https://www.context.dev), gives each claim its own [boat.dev](https://boat.dev) sandbox, and has an agent use the real product in Chrome on that sandbox's desktop while the screen records. Each claim comes back verified, partial, failed or untestable, with the recording as proof. [NY Token Exchange](https://nytokenexchange.com) writes the diligence memo on its confidential route and returns a signed inference receipt.
 
